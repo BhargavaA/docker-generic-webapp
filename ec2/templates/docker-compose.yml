@@ -2,12 +2,25 @@
 ######## MASTER MACHINE #########
 masterapi:
   build: base_docker
-  command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 5 master_api:app
+  command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
   volumes:
     - master_api:/master_api
   working_dir: /master_api
   ports:
-    - "0.0.0.0:8000:8000" # gunicorn
+    - "8000" # gunicorn
+  links:
+    - masterredis:MASTERREDIS
+  environment:
+   - PYTHONUNBUFFERED=TRUE
+
+masterapi1:
+  build: base_docker
+  command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
+  volumes:
+    - master_api:/master_api
+  working_dir: /master_api
+  ports:
+    - "8000" # gunicorn
   links:
     - masterredis:MASTERREDIS
   environment:
@@ -18,5 +31,15 @@ masterredis:
   command: redis-server
   volumes:
    - masterapi
+
+nginx:
+  image: nginx:latest
+  links:
+    - masterapi:masterapi
+    - masterapi1:masterapi1
+  ports:
+   - "0.0.0.0:80:80" 
+  volumes:
+   - nginx/conf:/etc/nginx
 ####################################
 

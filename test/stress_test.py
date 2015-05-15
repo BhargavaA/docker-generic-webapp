@@ -7,7 +7,7 @@ import json
 import time
 import os
 
-HOSTNAME = "ec2-52-25-58-241.us-west-2.compute.amazonaws.com:8000"
+HOSTNAME = "ec2-52-25-58-241.us-west-2.compute.amazonaws.com"
 
 import numpy
 import json
@@ -40,7 +40,7 @@ def simulate_one_client( input_args ):
 	rtt = []
 	try:
 		for i in range(n):
-			data = json.dumps({'search': 'abcd', 'text': 1,'sleep_time':0.1})
+			data = json.dumps({'search': 'abcd', 'text': 1,'sleep_time':0.0})
 			url =  'http://'+HOSTNAME+'/testconn'
 			ts = time.time()
 			response = requests.post(url,data,headers={'content-type':'application/json'})
