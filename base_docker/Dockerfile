@@ -10,9 +10,6 @@ RUN apt-get update && apt-get install -y \
     python-scipy \
     python-gevent 
 
-# Install gunicorn
-RUN pip install gunicorn
-
 # Install python dependencies for next_backend
 ADD requirements.txt /requirements.txt
 RUN pip install -U -r requirements.txt

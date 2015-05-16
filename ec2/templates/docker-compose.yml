@@ -1,26 +1,51 @@
 
+# ######## MASTER MACHINE #########
+# masterapi:
+#   build: base_docker
+#   command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
+#   volumes:
+#     - master_api:/master_api
+#   working_dir: /master_api
+#   ports:
+#     - "8000" # gunicorn
+#   links:
+#     - masterredis:MASTERREDIS
+#   environment:
+#    - PYTHONUNBUFFERED=TRUE
+
+# masterredis:
+#   image: redis
+#   command: redis-server
+#   volumes:
+#    - masterapi
+
+# # based on http://eyenx.ch/2015/04/18/loadbalancing-containers-with-docker-compose/
+# haproxy:
+#   image: tutum/haproxy
+#   links:
+#     - masterapi
+#   environment:
+#     - BACKEND_PORT=8000
+
+# nginx:
+#   build: nginx
+#   ports:
+#     - "80:80"
+#   links:
+#     - haproxy
+# ####################################
+
 ######## MASTER MACHINE #########
+
+# config based on http://stackoverflow.com/questions/14559987/why-is-gunicorn-behind-nginx-with-ssl-88-slower-than-gunicorn-alone
 masterapi:
   build: base_docker
-  command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
+  command: gunicorn  -k gevent --backlog 2048 --keep-alive 5  --reload -b 0.0.0.0:8000 -w 64 master_api:app
   volumes:
     - master_api:/master_api
   working_dir: /master_api
   ports:
-    - "8000" # gunicorn
-  links:
-    - masterredis:MASTERREDIS
-  environment:
-   - PYTHONUNBUFFERED=TRUE
-
-masterapi1:
-  build: base_docker
-  command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
-  volumes:
-    - master_api:/master_api
-  working_dir: /master_api
-  ports:
-    - "8000" # gunicorn
+    - "0.0.0.0:80:8000" # gunicorn
   links:
     - masterredis:MASTERREDIS
   environment:
@@ -31,15 +56,5 @@ masterredis:
   command: redis-server
   volumes:
    - masterapi
-
-nginx:
-  image: nginx:latest
-  links:
-    - masterapi:masterapi
-    - masterapi1:masterapi1
-  ports:
-   - "0.0.0.0:80:80" 
-  volumes:
-   - nginx/conf:/etc/nginx
 ####################################
 

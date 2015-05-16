@@ -7,7 +7,7 @@ import json
 import time
 import os
 
-HOSTNAME = "ec2-52-25-58-241.us-west-2.compute.amazonaws.com"
+HOSTNAME = "ec2-52-25-102-169.us-west-2.compute.amazonaws.com"
 
 import numpy
 import json
@@ -15,11 +15,11 @@ import requests
 from multiprocessing import Pool
 
 def run_all():
-	n = int(10)
+	n = int(50)
 
 	# print simulate_one_client( (n,0) )
 
-	num_clients = 200
+	num_clients = 100
 
 	pool = Pool(processes=num_clients)   
 
