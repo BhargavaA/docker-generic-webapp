@@ -35,26 +35,40 @@
 #     - haproxy
 # ####################################
 
-######## MASTER MACHINE #########
 
-# config based on http://stackoverflow.com/questions/14559987/why-is-gunicorn-behind-nginx-with-ssl-88-slower-than-gunicorn-alone
-masterapi:
+# ######## MASTER MACHINE #########
+# # config based on http://stackoverflow.com/questions/14559987/why-is-gunicorn-behind-nginx-with-ssl-88-slower-than-gunicorn-alone
+# masterapi:
+#   build: base_docker
+#   command: gunicorn  -k gevent  --reload -b 0.0.0.0:8000 -w 5 master_api:app
+#   volumes:
+#     - master_api:/master_api
+#   working_dir: /master_api
+#   ports:
+#     - "0.0.0.0:8000:8000" # gunicorn
+#   links:
+#     - masterredis:MASTERREDIS
+#   environment:
+#    - PYTHONUNBUFFERED=TRUE
+
+# masterredis:
+#   image: redis
+#   command: redis-server
+#   volumes:
+#    - masterapi
+# ####################################
+
+
+######## SIMPLE WORKER #########
+worker:
   build: base_docker
-  command: gunicorn  -k gevent  --reload -b 0.0.0.0:8000 -w 5 master_api:app
+  command: python main.py
   volumes:
-    - master_api:/master_api
-  working_dir: /master_api
-  ports:
-    - "0.0.0.0:8000:8000" # gunicorn
-  links:
-    - masterredis:MASTERREDIS
+    - generic_worker:/generic_worker
+  working_dir: /generic_worker
   environment:
    - PYTHONUNBUFFERED=TRUE
-
-masterredis:
-  image: redis
-  command: redis-server
-  volumes:
-   - masterapi
+   - AWS_ACCESS_ID
+   - AWS_SECRET_ACCESS_KEY
 ####################################
 
