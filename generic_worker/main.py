@@ -1,62 +1,59 @@
 """
 Load some data from disk, do some shit and save to S3
+
+Assumes following are set as environment variables:
+AWS_ACCESS_ID
+AWS_SECRET_ACCESS_KEY
 """
-
-
 
 import json
 import numpy
 from scipy.linalg import norm
 from datetime import datetime
 import time
+import os
+
+import boto_conn
+
+import subprocess
+subprocess.check_call('pwd')
+subprocess.check_call('ls')
+
+ACTIVE_MASTER = os.environ.get('ACTIVE_MASTER', '')
+
+
+#### TEST BOTO CONN ####
+filename = ACTIVE_MASTER+"_test.txt"
+test_string = 'This is some fake text generated at '+str(datetime.now())+'\n'
+with open(filename, "a") as myfile:
+    myfile.write(test_string)
+if not boto_conn.write_to_s3(local_filename_path=filename,s3_path='kgjamieson-general-compute/hyperband_nvb/'+filename):
+	raise
 
 
 
-#### LOAD SHIT ####
+
+#### LOAD DATA FROM DISK ####
 try:
 	filename = 'data/data.json'
 	fid = open(filename)
 	raw_data = fid.read()
-	data = eval(raw_data)
+	print raw_data
 except:
 	print 'Your file \'' + str(filename) + '\' failed to load'
 	raise
 
 
 
-#### DO SHIT TO S3 ####
+#### DO THINGS ####
 
 
 
 
-#### SAVE SHIT ####
-from boto.s3.connection import S3Connection
-from boto.s3.key import Key
-import boto
-import os
-AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
-conn = S3Connection(AWS_ACCESS_ID,AWS_SECRET_ACCESS_KEY)
-b = conn.get_bucket('fake-bucket-12ej1dj2912d21d12')
-
-print AWS_ACCESS_ID
-print AWS_SECRET_ACCESS_KEY
-
-full_filename = datetime.now() + '_' + str(filename)
-
-while True:
-	try:
-		print "trying to save " + str(full_filename)
-		k = Key(b)
-		k.key = str(full_filename)
-		bytes_saved = k.set_contents_from_filename( str(full_filename) )
-		break
-		# bytes_saved = k.set_contents_from_string(pickle_string)
-	except:
-		print "FAILED!"
-		pass
-
-print "[ %s ] done with backup of file %s to S3...  %d bytes saved" % (str(datetime.now()),full_filename,bytes_saved)
-
-
+#### SAVE TO S3 ####
+filename = ACTIVE_MASTER+"_some_fake_output.txt"
+test_string = 'This is some fake output generated at '+str(datetime.now())
+with open(filename, "a") as myfile:
+    myfile.write(test_string)
+boto_conn.write_to_s3(local_filename_path=filename,s3_path='kgjamieson-general-compute/hyperband_nvb/'+filename)
 

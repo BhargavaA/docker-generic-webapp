@@ -62,13 +62,14 @@
 ######## SIMPLE WORKER #########
 worker:
   build: base_docker
-  command: python main.py
+  command: python ./main.py
   volumes:
-    - generic_worker:/generic_worker
+   - ./generic_worker:/generic_worker 
   working_dir: /generic_worker
   environment:
    - PYTHONUNBUFFERED=TRUE
    - AWS_ACCESS_ID
    - AWS_SECRET_ACCESS_KEY
+   - ACTIVE_MASTER
 ####################################
 
