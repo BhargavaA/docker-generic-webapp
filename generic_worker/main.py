@@ -11,16 +11,12 @@ import numpy
 from scipy.linalg import norm
 from datetime import datetime
 import time
-import os
+
 
 import boto_conn
 
-import subprocess
-subprocess.check_call('pwd')
-subprocess.check_call('ls')
-
-ACTIVE_MASTER = os.environ.get('ACTIVE_MASTER', '')
-
+import os
+ACTIVE_MASTER = os.environ.get('ACTIVE_MASTER', 'localhost')
 
 #### TEST BOTO CONN ####
 filename = ACTIVE_MASTER+"_test.txt"

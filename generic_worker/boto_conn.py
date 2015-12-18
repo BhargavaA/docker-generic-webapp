@@ -15,6 +15,10 @@ import os
 
 
 def write_to_s3(local_filename_path,s3_path):
+	"""
+	local_filename_path: test.txt
+	s3_path: <bucket>/<directory1>/test.txt
+	"""
 
 	AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
 	AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')

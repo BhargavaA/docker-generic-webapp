@@ -3,3 +3,4 @@ redis
 tornado
 gunicorn
 boto
+theano

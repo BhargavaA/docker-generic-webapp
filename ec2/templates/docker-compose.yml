@@ -65,7 +65,7 @@ worker:
   command: python ./main.py
   volumes:
    - ./generic_worker:/generic_worker 
-  working_dir: /generic_worker
+  working_dir: /generic_worker/nvb
   environment:
    - PYTHONUNBUFFERED=TRUE
    - AWS_ACCESS_ID
