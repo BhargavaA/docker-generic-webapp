@@ -200,21 +200,24 @@ class MLP(object):
 def get_max_train_size():
     return 50000
 
+def get_max_iter():
+    return 40
+
 def get_param_ranges():
     return [{'name':'learning_rate','log10_scale':True,'range':(-3,-1)},
             {'name':'L2_reg','log10_scale':True,'range':(-6,-1)},
             {'name':'n_hidden','log10_scale':True,'range':(1,3)},]
 
-def run(params,train_size,verbose=False):
+def run(params,train_size=50000,n_epochs=40):
+    verbose = True
     learning_rate,L2_reg,n_hidden = params
-    if verbose: print "\tTraining %s on %d samples of %d" % ( str(params) , train_size, get_max_train_size() )
+    if verbose: print "\tTraining %s on %d samples of %d for %d epochs of %d" % ( str(params) , train_size, get_max_train_size(), n_epochs, get_max_iter() )
     ts = time.time()
-    error_progress = test_mlp(learning_rate=learning_rate, L1_reg=0.00, L2_reg=L2_reg, n_epochs=40,
-                     dataset='../mnist_nn/mnist.pkl.gz', batch_size=20, n_hidden=n_hidden, n_train=train_size)
-    this_error = error_progress[-1]
+    validation_error,test_error = test_mlp(learning_rate=learning_rate, L1_reg=0.00, L2_reg=L2_reg, n_epochs=int(n_epochs),
+                     dataset='../mnist_nn/mnist.pkl.gz', batch_size=20, n_hidden=int(n_hidden), n_train=int(train_size))
     dt = time.time()-ts
-    if verbose: print "\tCompleted in %.2f seconds, error=%f" % (dt,this_error)
-    return this_error
+    if verbose: print "\tCompleted in %.2f seconds, validation_error=%f, test_error=%f" % (dt,validation_error,test_error)
+    return validation_error,test_error
 
 def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
              dataset='mnist.pkl.gz', batch_size=20, n_hidden=500, n_train=None, verbose=False):
@@ -369,6 +372,8 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
     epoch = 0
     done_looping = False
 
+    this_validation_loss = 0.
+    this_test_loss = 0.
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
         for minibatch_index in xrange(n_train_batches):
@@ -430,7 +435,18 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((end_time - start_time) / 60.))
 
-    return error_progress
+
+
+    validation_losses = [validate_model(i) for i
+                         in xrange(n_valid_batches)]
+    this_validation_loss = numpy.mean(validation_losses)
+
+    # test it on the test set
+    test_losses = [test_model(i) for i
+                   in xrange(n_test_batches)]
+    this_test_loss = numpy.mean(test_losses)
+
+    return this_validation_loss,this_test_loss
 
 
 if __name__ == '__main__':

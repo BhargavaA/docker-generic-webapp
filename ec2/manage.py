@@ -915,7 +915,8 @@ def real_main():
             print "> %s" % inst.public_dns_name
 
         msg = "ALL DATA ON ALL NODES WILL BE LOST!!\nDestroy cluster %s (y/N): " % cluster_name
-        response = raw_input(msg)
+        # response = raw_input(msg)
+        response = 'y'
         if response == "y":
             print "Terminating master..."
             for inst in master_nodes:

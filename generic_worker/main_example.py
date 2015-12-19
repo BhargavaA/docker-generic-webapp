@@ -1,4 +1,6 @@
 """
+Change the docker-compose.yml template file in /ec2 to point to this file 
+
 Load some data from disk, do some shit and save to S3
 
 Assumes following are set as environment variables:

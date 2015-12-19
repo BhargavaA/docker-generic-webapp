@@ -1,4 +1,20 @@
 
+
+######## SIMPLE WORKER #########
+worker:
+  build: base_docker
+  command: python ./main.py
+  volumes:
+   - ./generic_worker:/generic_worker 
+  working_dir: /generic_worker/random_full
+  environment:
+   - PYTHONUNBUFFERED=TRUE
+   - AWS_ACCESS_ID
+   - AWS_SECRET_ACCESS_KEY
+   - ACTIVE_MASTER
+####################################
+
+
 # ######## MASTER MACHINE #########
 # masterapi:
 #   build: base_docker
@@ -59,17 +75,4 @@
 # ####################################
 
 
-######## SIMPLE WORKER #########
-worker:
-  build: base_docker
-  command: python ./main.py
-  volumes:
-   - ./generic_worker:/generic_worker 
-  working_dir: /generic_worker/nvb
-  environment:
-   - PYTHONUNBUFFERED=TRUE
-   - AWS_ACCESS_ID
-   - AWS_SECRET_ACCESS_KEY
-   - ACTIVE_MASTER
-####################################
 
