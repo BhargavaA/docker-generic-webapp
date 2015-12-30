@@ -644,7 +644,10 @@ def rsync_docker_config(opts, master_nodes, slave_nodes):
 
 
     unicorn_multiplier = 0.5
-    docker_compose_template_vars = {    }
+    docker_compose_template_vars = {   
+        "WORKER_WORKING_DIR":os.getenv('WORKER_WORKING_DIR','python ./main.py'),
+        "WORKER_COMMAND":os.getenv('WORKER_COMMAND',"/generic_worker"),
+    }
     with open('./templates/docker-compose.yml') as src:
         with open(tmp_dir+'/docker-compose.yml', "w") as dest:
             text = src.read()

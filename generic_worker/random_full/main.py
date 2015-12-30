@@ -35,9 +35,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
         else:
             hyperparameters = params
 
-        ts = time.time()
-        validation_loss,test_loss = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
-        this_dt = time.time()-ts
+        validation_loss,test_loss,this_dt = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
 
         if validation_loss<min_err:
             min_err = validation_loss
@@ -50,7 +48,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
             myfile.write(this_str)
 
         filename = UID+"_jobs.txt"
-        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_random/'+filename)
+        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_random_full_round2/'+filename)
         ########################################
 
     return min_err,min_params

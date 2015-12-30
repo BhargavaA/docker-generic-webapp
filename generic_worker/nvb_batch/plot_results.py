@@ -18,8 +18,8 @@ rng = numpy.random.RandomState() # generates from cache or something always rand
 
 def get_time_series_on_grid(grid_times):
     import boto_conn
-    boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_nvb_batch','nvb_batch')
-    local_path = 'nvb_batch/hyperband_data_nvb_batch'
+    boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_nvb_batch_round2','nvb_batch')
+    local_path = 'nvb_batch/hyperband_data_nvb_batch_round2'
     
     
 
@@ -37,7 +37,7 @@ def get_time_series_on_grid(grid_times):
     # allfiles = [f for f in listdir(local_path) if isfile(join(local_path, f))]
     min_iter = 2
     max_iter = 40
-    min_train_size = 4000
+    min_train_size = 2000
     max_train_size = 50000
 
     time_series = []
@@ -73,7 +73,7 @@ def get_time_series_on_grid(grid_times):
             while num_pulls>=min_train_size:
 
                 group=[]
-                if num_arms>2 or (num_arms==1 and num_pulls==max_train_size): # change this line for future data to reflect actual run code
+                if num_arms>2:
                     for ell in range(num_arms):
                         if idx==len(data_mat):
                             break
@@ -110,19 +110,21 @@ def get_time_series_on_grid(grid_times):
                 for row in group:
 
                     train_size,num_iters,validation_error,test_error,dt,params_str = row
+                    train_size = int(train_size)
                     validation_error = float(validation_error)
                     dt = float(dt)
-                    duration += dt
-                    if validation_error<min_err:
-                        try:
-                            losses.append( losses[-1]  )
-                            times.append( duration-.0001  )
-                        except:
-                            pass              
-                        # print train_size,num_iters,validation_error,dt,params_str               
-                        times.append(duration)
-                        losses.append(validation_error)
-                        min_err = validation_error
+                    if train_size>=4000:
+                        duration += dt
+                        if validation_error<min_err:
+                            try:
+                                losses.append( losses[-1]  )
+                                times.append( duration-.0001  )
+                            except:
+                                pass              
+                            # print train_size,num_iters,validation_error,dt,params_str               
+                            times.append(duration)
+                            losses.append(validation_error)
+                            min_err = validation_error
 
         times.append(duration)
         losses.append(losses[-1])

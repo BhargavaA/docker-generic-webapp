@@ -17,8 +17,8 @@ rng = numpy.random.RandomState() # generates from cache or something always rand
 
 def get_time_series_on_grid(grid_times):
     import boto_conn
-    boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_random','random_full')
-    local_path = 'random_full/hyperband_data_random'
+    boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_random_full_round2','random_full')
+    local_path = 'random_full/hyperband_data_random_full_round2'
 
     import csv
     from os import listdir

@@ -11,7 +11,7 @@ import time
 
 
 
-max_time = 2*3600
+max_time = 1.0*3600
 N = 1000
 grid_times = numpy.linspace(0,max_time,N)
 

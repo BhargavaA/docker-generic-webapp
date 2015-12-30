@@ -212,12 +212,10 @@ def run(params,train_size=50000,n_epochs=40):
     verbose = True
     learning_rate,L2_reg,n_hidden = params
     if verbose: print "\tTraining %s on %d samples of %d for %d epochs of %d" % ( str(params) , train_size, get_max_train_size(), n_epochs, get_max_iter() )
-    ts = time.time()
-    validation_error,test_error = test_mlp(learning_rate=learning_rate, L1_reg=0.00, L2_reg=L2_reg, n_epochs=int(n_epochs),
+    validation_error,test_error,dt = test_mlp(learning_rate=learning_rate, L1_reg=0.00, L2_reg=L2_reg, n_epochs=int(n_epochs),
                      dataset='../mnist_nn/mnist.pkl.gz', batch_size=20, n_hidden=int(n_hidden), n_train=int(train_size))
-    dt = time.time()-ts
     if verbose: print "\tCompleted in %.2f seconds, validation_error=%f, test_error=%f" % (dt,validation_error,test_error)
-    return validation_error,test_error
+    return validation_error,test_error,dt
 
 def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
              dataset='mnist.pkl.gz', batch_size=20, n_hidden=500, n_train=None, verbose=False):
@@ -248,7 +246,13 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
 
 
    """
+
+    total_time = 0.
+    
+    ts=time.time()
+    if verbose: print 'loading the data ...'
     datasets = load_data(dataset)
+    if verbose: print 'Done! %.2f seconds' % (time.time()-ts)
 
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
@@ -264,7 +268,8 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
     ######################
     # BUILD ACTUAL MODEL #
     ######################
-    if verbose: print '... building the model'
+    ts=time.time()
+    if verbose: print 'building the model ...'
 
     # allocate symbolic variables for the data
     index = T.lscalar()  # index to a [mini]batch
@@ -344,11 +349,13 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
         }
     )
     # end-snippet-5
+    if verbose: print 'Done! %.2f seconds' % (time.time()-ts)
 
     ###############
     # TRAIN MODEL #
     ###############
-    if verbose: print '... training'
+    ts=time.time()
+    if verbose: print 'training ...'
 
     error_progress = []
 
@@ -446,7 +453,11 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=5,
                    in xrange(n_test_batches)]
     this_test_loss = numpy.mean(test_losses)
 
-    return this_validation_loss,this_test_loss
+    if verbose: print 'Done! %.2f seconds' % (time.time()-ts)
+
+    total_time += time.time()-ts
+
+    return this_validation_loss,this_test_loss,total_time
 
 
 if __name__ == '__main__':

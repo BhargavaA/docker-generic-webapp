@@ -19,7 +19,7 @@ rng = numpy.random.RandomState() # generates from cache or something always rand
 stop_time = 2.5*3600
 min_iter = int(2)
 max_iter = int(problem.get_max_iter())
-min_train_size = int(4000)
+min_train_size = int(2000)
 max_train_size = int(problem.get_max_train_size())
 param_info = problem.get_param_ranges()
 
@@ -35,9 +35,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
         else:
             hyperparameters = params
 
-        ts = time.time()
-        validation_loss,test_loss = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
-        this_dt = time.time()-ts
+        validation_loss,test_loss,this_dt = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
 
         if validation_loss<min_err:
             min_err = validation_loss
@@ -50,7 +48,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
             myfile.write(this_str)
 
         filename = UID+"_jobs.txt"
-        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_nvb_batch/'+filename)
+        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_nvb_batch_round2/'+filename)
         ########################################
 
     return min_err,min_params

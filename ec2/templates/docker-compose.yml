@@ -3,10 +3,10 @@
 ######## SIMPLE WORKER #########
 worker:
   build: base_docker
-  command: python ./main.py
+  command: {{WORKER_COMMAND}}
   volumes:
    - ./generic_worker:/generic_worker 
-  working_dir: /generic_worker/random_full
+  working_dir: {{WORKER_WORKING_DIR}}
   environment:
    - PYTHONUNBUFFERED=TRUE
    - AWS_ACCESS_ID
