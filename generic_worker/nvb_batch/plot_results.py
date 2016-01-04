@@ -14,11 +14,11 @@ import time
 # rng = numpy.random.RandomState(12345)
 rng = numpy.random.RandomState() # generates from cache or something always random
 
+import boto_conn
 
-
-def get_time_series_on_grid(grid_times):
-    import boto_conn
-    boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_nvb_batch_round2','nvb_batch')
+def get_time_series_on_grid(grid_times,fresh_data=True):
+    if fresh_data:
+        boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_nvb_batch_round2','nvb_batch')
     local_path = 'nvb_batch/hyperband_data_nvb_batch_round2'
     
     
@@ -55,8 +55,7 @@ def get_time_series_on_grid(grid_times):
                 test_error = float(row[3])
                 dt = float(row[4])
                 params_str = row[5]+row[6]+row[7]
-                if idx>0: # change this line for future data to reflect actual run code (this doesn't use the first run by default)
-                    data_mat.append(  [train_size,num_iters,validation_error,test_error,dt,params_str]  )
+                data_mat.append(  [train_size,num_iters,validation_error,test_error,dt,params_str]  )
                 idx+=1
 
 

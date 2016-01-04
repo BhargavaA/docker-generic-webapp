@@ -27,6 +27,7 @@ param_info = problem.get_param_ranges()
 def run_trials(num_arms,train_size,num_iters,UID='',params=None):
     n = num_arms
     min_err = float('inf')
+    trials_ts = time.time()
 
     for i in range(n):
         # generate hyperparameters
@@ -51,7 +52,8 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
         boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_nvb_iter_round2/'+filename)
         ########################################
 
-    return min_err,min_params
+    trials_dt = time.time() - trials_ts
+    return min_err,min_params,trials_dt
 
 
 # starts a new simulation once the last one has reached the stopping time
@@ -74,13 +76,14 @@ while True:
 
             if num_arms>2:
                 print "Starting num_pulls=%d, num_arms=%d" %(num_pulls,num_arms)
-                pre_error,this_hyperparameters = run_trials(num_arms=num_arms,train_size=max_train_size,num_iters=num_pulls,UID=UID)
+                pre_error,this_hyperparameters,this_dt = run_trials(num_arms=num_arms,train_size=max_train_size,num_iters=num_pulls,UID=UID)
+                dt += this_dt
 
                 # after running a batch, pick the best and train on all the data (unless batch used max_train_size)
                 if num_pulls<max_iter:
-                    this_error,that_hyperparameters = run_trials(num_arms=1,train_size=max_train_size,num_iters=max_iter,UID=UID,params=this_hyperparameters)
+                    this_error,that_hyperparameters,this_dt = run_trials(num_arms=1,train_size=max_train_size,num_iters=max_iter,UID=UID,params=this_hyperparameters)
+                    dt += this_dt
 
-                dt = time.time() - ts
 
             num_pulls = int(num_pulls/2)
             num_arms = int(B/num_pulls)
