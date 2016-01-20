@@ -5,7 +5,7 @@ Load some data from disk, do some shit and save to S3
 import json
 from datetime import datetime
 import time
-
+from sys import argv, stdout
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -40,9 +40,23 @@ def write_to_s3(local_filename_path,s3_path,verbose=False):
 	while True:
 		try:
 			if verbose: print "trying to save " + local_filename_path + "  to " + AWS_FILENAME
+
+			stdout.flush()
+			start = time.time()
+			def callback( transmitted, size ):
+				"Progress callback for set_contents_from_filename"
+				elapsed = time.time() - start
+				percent = 100.0 * transmitted / size
+				kbps = .001 * transmitted / elapsed
+				print ( '\r%d bytes transmitted of %d (%.2f%%),'
+						' %.2f KB/sec ' %
+						( transmitted, size, percent, kbps ) ),
+				stdout.flush()
+
+
 			k = Key(b)
 			k.key = AWS_FILENAME
-			bytes_saved = k.set_contents_from_filename( local_filename_path )
+			bytes_saved = k.set_contents_from_filename( local_filename_path , cb=callback, num_cb=100 )
 			break
 		except:
 			ell+=1
@@ -77,12 +91,12 @@ def download_from_s3(s3_path,local_path='.',verbose=False):
 	conn = S3Connection(AWS_ACCESS_ID,AWS_SECRET_ACCESS_KEY)
 	b = conn.get_bucket(AWS_BUCKET)
 	for key in b.list(AWS_DIRECTORY):
-	    try:
-	    	filename = '/'.join([local_path,key.name])
-	    	directory = os.path.dirname(filename)
-	    	if not os.path.exists(directory):
+		try:
+			filename = '/'.join([local_path,key.name])
+			directory = os.path.dirname(filename)
+			if not os.path.exists(directory):
 				os.makedirs(directory)
-	        res = key.get_contents_to_filename(filename)
-	    except:
-	        print (key.name+":"+"FAILED")
+			res = key.get_contents_to_filename(filename)
+		except:
+			print (key.name+":"+"FAILED")
 

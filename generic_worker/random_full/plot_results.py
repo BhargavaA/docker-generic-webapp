@@ -17,8 +17,8 @@ import boto_conn
 
 def get_time_series_on_grid(grid_times,fresh_data=True):
     if fresh_data:
-        boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_random_full_round2','random_full')
-    local_path = 'random_full/hyperband_data_random_full_round2'
+        boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_random_full_round3','random_full')
+    local_path = 'random_full/hyperband_data_random_full_round3'
 
     import csv
     from os import listdir
