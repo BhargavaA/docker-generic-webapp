@@ -71,51 +71,52 @@ while True:
         print '###################'
 
 
-        alpha = 3.
-        def logalpha(x):
-            return numpy.log(x)/numpy.log(alpha)
+        eta = 3.
+        def logeta(x):
+            return numpy.log(x)/numpy.log(eta)
 
         # s_max defines the number of inner loops per unique value of B
         # it also specifies the maximum number of rounds
         R = float(max_train_size)
         r = float(min_train_size)
-        s_max = int(logalpha(R/r))
-        s = s_max
-        while s >= 0 and dt<stop_time:
+        ell_max = int(min(B/R-1,int(logeta(R/r))))
+        ell = ell_max
+        while ell >= 0 and dt<stop_time:
 
             # specify the number of arms and the number of times each arm is pulled per stage within this innerloop
-            rs = [ int(R*alpha**(-i)) for i in range(s+1) ]
-            ns = [ int(B/(s+1.)/float(rs[i])) for i in range(s+1)]
-            
-            num_samples = sum( ns[i]*rs[i] for i in range(s+1) )
+            n = int( B/R*eta**ell/(ell+1.) )
 
-            if ns[0]>   0:
-                print 
-                print 's=',s
-                print 'n_i\tr_k'
+            if n> 0:
+                
                 round_hyperparameters = []
-                for i in range(ns[s]):
+                for i in range(n):
                     hyperparameters = [ 10**rng.uniform( p['range'][0] , p['range'][1] )  for p in param_info  ]
                     round_hyperparameters.append( hyperparameters )
+                s = 0
+                while (n+1)*R*(s+1.)*eta**(-s)>B:
+                    s+=1
+                s-=1
 
+                print 
+                print 's=%d, n=%d' %(s,n)
+                print 'n_i\tr_k'
                 for i in range(s+1):
-                    print '%d\t%d' %(ns[s-i],rs[s-i])
-                    num_pulls = rs[s-i]
-                    num_arms = ns[s-i]
+                    
+                    num_pulls = int( R*eta**(i-s) )
+                    num_arms = int( n*eta**(-i) )
+                    print '%d\t%d' %(num_arms,num_pulls)
 
                     results,this_dt = run_trials(round_hyperparameters=round_hyperparameters,train_size=num_pulls,num_iters=max_iter,UID=UID)
 
                     # pick the top results
+                    n_k1 = int( n*eta**(-i-1) )
                     results = sorted(results,key=lambda x: x[1])
                     if s-i-1>=0:
-                        round_hyperparameters = [ x[0] for x in results[0:ns[s-i-1]] ]
+                        round_hyperparameters = [ x[0] for x in results[0:n_k1] ]
                     else:
                         break
 
 
-
-                print 'num_samples=%d' % num_samples
-
-            s-=1
+            ell-=1
 
             dt = time.time() - ts
