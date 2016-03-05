@@ -48,7 +48,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
             myfile.write(this_str)
 
         filename = UID+"_jobs.txt"
-        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/hyperband_data_random_full_round3/'+filename)
+        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/multilayer_perceptron_random_full_round1/'+filename)
         ########################################
 
     return min_err,min_params

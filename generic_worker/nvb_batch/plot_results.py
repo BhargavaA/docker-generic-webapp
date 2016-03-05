@@ -92,7 +92,7 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
                 num_arms = int(B/num_pulls)
 
             # randomly shuffle the order of the groups
-            # big_group = list(numpy.random.permutation(big_group))
+            big_group = list(numpy.random.permutation(big_group))
 
             if len(big_group)>0:
                 grouped_data.append(big_group)

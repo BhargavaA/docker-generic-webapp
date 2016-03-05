@@ -201,7 +201,7 @@ def get_max_train_size():
     return 50000
 
 def get_max_iter():
-    return 40
+    return 100
 
 def get_param_ranges():
     return [{'name':'learning_rate','log10_scale':True,'range':(-3,-1)},
