@@ -67,6 +67,7 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
                             pass                            
                         times.append(duration)
                         losses.append(validation_error)
+                        # losses.append(test_error)
                         min_err = validation_error
 
                     dup_check[params_str] = True
@@ -87,8 +88,15 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
             except:
                 data[k][i] = t[1][0]
 
-    import matplotlib.pyplot as plt
-    plt.hist(all_dt, 50, normed=1, facecolor='k', alpha=0.75)
-    plt.show()
-    raise
+    # all_dt = sorted(all_dt)
+    # print 'mean : %f' % numpy.mean(all_dt)
+    # print '50%% : %f' % all_dt[int(.5*len(all_dt))]
+    # print '95%% : %f' % all_dt[int(.95*len(all_dt))]
+    # print '99%% : %f' % all_dt[int(.99*len(all_dt))]
+
+    # import matplotlib.pyplot as plt
+    # plt.hist(all_dt, 50, normed=1, facecolor='k', alpha=0.75)
+    # plt.show()
+    # raise
+    
     return data

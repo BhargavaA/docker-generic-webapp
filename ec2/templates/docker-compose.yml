@@ -16,45 +16,8 @@ worker:
 ####################################
 
 
-# ######## MASTER MACHINE #########
-# masterapi:
-#   build: base_docker
-#   command: gunicorn  --worker-class=gevent  --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w 3 master_api:app
-#   volumes:
-#     - master_api:/master_api
-#   working_dir: /master_api
-#   ports:
-#     - "8000" # gunicorn
-#   links:
-#     - masterredis:MASTERREDIS
-#   environment:
-#    - PYTHONUNBUFFERED=TRUE
-
-# masterredis:
-#   image: redis
-#   command: redis-server
-#   volumes:
-#    - masterapi
-
-# # based on http://eyenx.ch/2015/04/18/loadbalancing-containers-with-docker-compose/
-# haproxy:
-#   image: tutum/haproxy
-#   links:
-#     - masterapi
-#   environment:
-#     - BACKEND_PORT=8000
-
-# nginx:
-#   build: nginx
-#   ports:
-#     - "80:80"
-#   links:
-#     - haproxy
-# ####################################
-
 
 # ######## MASTER MACHINE #########
-# # config based on http://stackoverflow.com/questions/14559987/why-is-gunicorn-behind-nginx-with-ssl-88-slower-than-gunicorn-alone
 # masterapi:
 #   build: base_docker
 #   command: gunicorn  -k gevent  --reload -b 0.0.0.0:8000 -w 5 master_api:app

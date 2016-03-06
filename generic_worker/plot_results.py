@@ -11,7 +11,7 @@ import time
 
 
 fresh_data = False
-max_time = 7*3600
+max_time = 1.5*3600
 N = 1000
 grid_times = numpy.linspace(0,max_time,N)
 
@@ -69,14 +69,14 @@ print 'hyperband_iter timeseries = %d' % len(hyperband_iter_data)
 
 # print grid_times
 
-
+import mpld3
 import matplotlib.pyplot as plt
 # plt.plot(grid_times,random_data.T,color='black')
 plt.plot(grid_times,random_mean_data,linewidth=2,color='black',label='random' )
 # plt.plot(grid_times,nvb_data.T,color='red')
 # plt.plot(grid_times,nvb_mean_data,linewidth=2,color='red' ,label='nvb_batch'   )
 # plt.plot(grid_times,hyperband_batch_mean_data,linewidth=2,color='blue' ,label='hyperband_batch'   )
-plt.plot(grid_times,hyperband_iter_mean_data,linewidth=2,color='blue' ,label='hyperband_batch'   )
+plt.plot(grid_times,hyperband_iter_mean_data,linewidth=2,color='blue' ,label='hyperband_iter'   )
 # plt.plot(grid_times,hyperband_iter_data.T,color='blue')
 # plt.plot(grid_times,hyperband_batch_data.T,color='blue')
 # plt.plot(grid_times,nvb_iter_mean_data,linewidth=2,color='blue' ,label='nvb_iter'   )
@@ -84,7 +84,9 @@ plt.plot(grid_times,hyperband_iter_mean_data,linewidth=2,color='blue' ,label='hy
 # plt.plot(grid_times,bandit_iter_mean_data,linewidth=2,color='g' ,label='bandit_iter'   )
 # plt.plot(grid_times,rr_batch_mean_data,linewidth=2,color='c' ,label='rr_batch'   )
 # plt.plot(grid_times,rr_iter_mean_data,linewidth=2,color='y' ,label='rr_iter'   )
-plt.xlabel('Seconds')
-plt.ylabel('Validation error')
+plt.xlabel('Seconds', fontsize=18)
+plt.ylabel('Validation error', fontsize=18)
+plt.title('MNIST, 2-layer CVN + 1-layer Hidden, 4 hyperparameters, nepoch=15', fontsize=18)
 plt.legend()
-plt.show()
+# plt.show()
+mpld3.show()
