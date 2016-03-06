@@ -117,9 +117,9 @@ class LeNetConvPoolLayer(object):
         # keep track of model input
         self.input = input
 
-def get_max_train_size():
-    # maximum number of datapoints to look at (dataset size)
-    return 50000
+def get_min_iter():
+    # minimum number of epochs to run
+    return 1
 
 def get_max_iter():
     # maximum number of epochs to run
@@ -136,17 +136,21 @@ def get_random_hyperparams(n=1):
         params.append([learning_rate,k1,k2,batch_size])
     return params
 
-def run(params,train_size=50000,n_epochs=40):
+def run(params,train_size=0,n_epochs=0):
+    max_train_size = 50000
+    if train_size==0: train_size=max_train_size
+    max_iter = get_max_iter()
+    if n_epochs==0: n_epochs=max_iter
     verbose = True
     learning_rate,k1,k2,batch_size = params
-    if verbose: print "\tTraining %s on %d samples of %d for %d epochs of %d" % ( str(params) , train_size, get_max_train_size(), n_epochs, get_max_iter() )
+    if verbose: print "\tTraining %s on %d samples of %d for %d epochs of %d" % ( str(params) , train_size, max_train_size, n_epochs, max_iter )
     validation_error,test_error,dt = evaluate_lenet5(learning_rate=learning_rate, n_epochs=int(n_epochs),dataset='../mnist_nn/mnist.pkl.gz',nkerns=[int(k1), int(k2)], batch_size=batch_size, n_train=int(train_size))
     if verbose: print "\tCompleted in %.2f seconds, validation_error=%f, test_error=%f" % (dt,validation_error,test_error)
     return validation_error,test_error,dt
 
 def evaluate_lenet5(learning_rate=0.1, n_epochs=200,
                     dataset='mnist.pkl.gz',
-                    nkerns=[20, 50], batch_size=500, n_train=None, verbose=False):
+                    nkerns=[20, 50], batch_size=500, n_train=50000, verbose=False):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float

@@ -17,13 +17,10 @@ import boto_conn
 # rng = numpy.random.RandomState(12345)
 
 stop_time = 25*3600
-min_iter = int(1)
+min_iter = int(max(1,problem.get_min_iter()))
 max_iter = int(problem.get_max_iter())
-min_train_size = int(2000)
-max_train_size = int(problem.get_max_train_size())
 
-
-def run_trials(round_hyperparameters,train_size,num_iters,UID='',params=None):
+def run_trials(round_hyperparameters,train_size=0,num_iters=0,UID='',params=None):
     n = len(round_hyperparameters)
     min_err = float('inf')
     trials_ts = time.time()
@@ -33,7 +30,7 @@ def run_trials(round_hyperparameters,train_size,num_iters,UID='',params=None):
     for i in range(n):
         hyperparameters = round_hyperparameters[i]
 
-        validation_loss,test_loss,this_dt = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
+        validation_loss,test_loss,this_dt = problem.run(hyperparameters,n_epochs=num_iters)
 
         results.append( (hyperparameters,validation_loss,test_loss) )
 
@@ -110,7 +107,7 @@ while True:
                         max_B = B
  
                     # pull arms!
-                    results,this_dt = run_trials(round_hyperparameters=round_hyperparameters,train_size=max_train_size,num_iters=num_pulls,UID=UID)
+                    results,this_dt = run_trials(round_hyperparameters=round_hyperparameters,num_iters=num_pulls,UID=UID)
 
                     # pick the top results
                     n_k1 = int( n*eta**(-i-1) )

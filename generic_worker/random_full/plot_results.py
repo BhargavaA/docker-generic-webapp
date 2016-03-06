@@ -15,7 +15,7 @@ rng = numpy.random.RandomState() # generates from cache or something always rand
 import boto_conn
 
 
-def get_time_series_on_grid(grid_times,fresh_data=True):
+def get_time_series_on_grid(grid_times,fresh_data=True,result_type='validation'):
     if fresh_data:
         boto_conn.download_from_s3('kgjamieson-general-compute/convolutional_mlp_random_full_round1','random_full')
     local_path = 'random_full/convolutional_mlp_random_full_round1'
@@ -66,8 +66,10 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
                         except:
                             pass                            
                         times.append(duration)
-                        losses.append(validation_error)
-                        # losses.append(test_error)
+                        if result_type=='validation':
+                            losses.append(validation_error)
+                        else:
+                            losses.append(test_error)
                         min_err = validation_error
 
                     dup_check[params_str] = True
@@ -98,5 +100,5 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
     # plt.hist(all_dt, 50, normed=1, facecolor='k', alpha=0.75)
     # plt.show()
     # raise
-    
+
     return data

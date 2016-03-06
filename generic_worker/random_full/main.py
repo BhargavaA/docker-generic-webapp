@@ -18,13 +18,10 @@ import boto_conn
 rng = numpy.random.RandomState() # generates from cache or something always random
 
 stop_time = 25*3600
-min_iter = int(2)
+min_iter = int(max(1,problem.get_min_iter()))
 max_iter = int(problem.get_max_iter())
-min_train_size = int(4000)
-max_train_size = int(problem.get_max_train_size())
 
-
-def run_trials(num_arms,train_size,num_iters,UID='',params=None):
+def run_trials(num_arms,train_size=0,num_iters=0,UID='',params=None):
     n = num_arms
     min_err = float('inf')
 
@@ -34,7 +31,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
 
     for i in range(n):
 
-        validation_loss,test_loss,this_dt = problem.run(hyperparameters[i],train_size=train_size,n_epochs=num_iters)
+        validation_loss,test_loss,this_dt = problem.run(hyperparameters[i],n_epochs=num_iters)
 
         if validation_loss<min_err:
             min_err = validation_loss
@@ -60,7 +57,7 @@ while True:
     ts = time.time()
     print '\n\n################ STARTING %s ################\n' % UID
     while dt<stop_time:
-        this_error,that_hyperparameters = run_trials(num_arms=1,train_size=max_train_size,num_iters=max_iter,UID=UID)
+        this_error,that_hyperparameters = run_trials(num_arms=1,num_iters=max_iter,UID=UID)
         dt = time.time() - ts
 
 

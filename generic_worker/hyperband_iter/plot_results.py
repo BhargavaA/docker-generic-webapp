@@ -16,13 +16,13 @@ rng = numpy.random.RandomState() # generates from cache or something always rand
 
 import boto_conn
 
-def get_time_series_on_grid(grid_times,fresh_data=True):
+def get_time_series_on_grid(grid_times,fresh_data=True,result_type='validation'):
     if fresh_data:
         boto_conn.download_from_s3('kgjamieson-general-compute/convolutional_mlp_hyperband_iter_round1','hyperband_iter')
     local_path = 'hyperband_iter/convolutional_mlp_hyperband_iter_round1'
     
     # 1-17, 18-24, 25-29
-    # active_set = range(25,30)
+    # active_set = range(1,18)
     active_set = None
     
     import csv
@@ -71,8 +71,10 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
                             except:
                                 pass                            
                             times.append(duration)
-                            losses.append(validation_error)
-                            # losses.append(test_error)
+                            if result_type=='validation':
+                                losses.append(validation_error)
+                            else:
+                                losses.append(test_error)
                             min_err = validation_error
 
                         dup_check[params_str] = True
