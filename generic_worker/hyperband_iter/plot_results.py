@@ -18,8 +18,8 @@ import boto_conn
 
 def get_time_series_on_grid(grid_times,fresh_data=True):
     if fresh_data:
-        boto_conn.download_from_s3('kgjamieson-general-compute/hyperband_data_hyperband_batch_round3','hyperband_batch')
-    local_path = 'hyperband_batch/hyperband_data_hyperband_batch_round3'
+        boto_conn.download_from_s3('kgjamieson-general-compute/multilayer_perceptron_hyperband_iter_round1','hyperband_batch')
+    local_path = 'hyperband_batch/multilayer_perceptron_hyperband_iter_round1'
     
     
 

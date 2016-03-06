@@ -130,8 +130,8 @@ def get_random_hyperparams(n=1):
     params = []
     for i in range(n):
         learning_rate = 10**rng.uniform( -3 , -1 )
-        k2 = int(10**rng.uniform( 0 , 2 ))
-        k1 = int( 1+k2*rng.uniform( 0 , 1 ) )
+        k2 = int( rng.uniform( 10 , 60 ) )
+        k1 = int( rng.uniform( 5 , k2 ) )
         batch_size = int(10**rng.uniform( 1 , 3 ))
         params.append([learning_rate,k1,k2,batch_size])
     return params

@@ -16,7 +16,7 @@ import boto_conn
 
 # rng = numpy.random.RandomState(12345)
 
-stop_time = 2.5*3600
+stop_time = 5*3600
 min_iter = int(2)
 max_iter = int(problem.get_max_iter())
 min_train_size = int(2000)

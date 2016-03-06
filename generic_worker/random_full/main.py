@@ -4,7 +4,8 @@ The only thing specific to mnist here is the min_train_size. This value may be d
 """
 import sys
 sys.path.append("../")
-import mnist_nn.nn_logistic as problem
+# import mnist_nn.nn_logistic as problem
+import mnist_nn.convolutional_mlp as problem
 
 from datetime import datetime
 import numpy
@@ -16,26 +17,24 @@ import boto_conn
 # rng = numpy.random.RandomState(12345)
 rng = numpy.random.RandomState() # generates from cache or something always random
 
-stop_time = 2.5*3600
+stop_time = 5*3600
 min_iter = int(2)
 max_iter = int(problem.get_max_iter())
 min_train_size = int(4000)
 max_train_size = int(problem.get_max_train_size())
-param_info = problem.get_param_ranges()
 
 
 def run_trials(num_arms,train_size,num_iters,UID='',params=None):
     n = num_arms
     min_err = float('inf')
 
-    for i in range(n):
-        # generate hyperparameters
-        if params==None:
-            hyperparameters = [ 10**rng.uniform( p['range'][0] , p['range'][1] )  for p in param_info  ]
-        else:
-            hyperparameters = params
+    if params==None:
+        # select hyperparameters!
+        hyperparameters = problem.get_random_hyperparams(n)
 
-        validation_loss,test_loss,this_dt = problem.run(hyperparameters,train_size=train_size,n_epochs=num_iters)
+    for i in range(n):
+
+        validation_loss,test_loss,this_dt = problem.run(hyperparameters[i],train_size=train_size,n_epochs=num_iters)
 
         if validation_loss<min_err:
             min_err = validation_loss
@@ -48,7 +47,7 @@ def run_trials(num_arms,train_size,num_iters,UID='',params=None):
             myfile.write(this_str)
 
         filename = UID+"_jobs.txt"
-        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/multilayer_perceptron_random_full_round1/'+filename)
+        boto_conn.write_to_s3(local_filename_path=UID+"_jobs.txt",s3_path='kgjamieson-general-compute/convolutional_mlp_random_full_round1/'+filename)
         ########################################
 
     return min_err,min_params
