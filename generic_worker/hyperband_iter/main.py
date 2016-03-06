@@ -16,8 +16,8 @@ import boto_conn
 
 # rng = numpy.random.RandomState(12345)
 
-stop_time = 5*3600
-min_iter = int(2)
+stop_time = 25*3600
+min_iter = int(1)
 max_iter = int(problem.get_max_iter())
 min_train_size = int(2000)
 max_train_size = int(problem.get_max_train_size())
@@ -67,7 +67,7 @@ while True:
     UID = os.urandom(16).encode('hex')
     ts = time.time()
     min_err = float('inf')
-    k=1
+    k=2
     print '\n\n################ STARTING %s ################\n' % UID
     while dt<stop_time:
         B = min(max_B,int((2**k)*max_iter))

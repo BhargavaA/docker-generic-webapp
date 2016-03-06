@@ -12,6 +12,7 @@ worker:
    - AWS_ACCESS_ID
    - AWS_SECRET_ACCESS_KEY
    - ACTIVE_MASTER
+   - THEANO_FLAGS='floatX=float32'
 ####################################
 
 

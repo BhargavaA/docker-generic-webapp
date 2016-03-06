@@ -17,8 +17,10 @@ import boto_conn
 
 def get_time_series_on_grid(grid_times,fresh_data=True):
     if fresh_data:
-        boto_conn.download_from_s3('kgjamieson-general-compute/multilayer_perceptron_random_full_round1','random_full')
-    local_path = 'random_full/multilayer_perceptron_random_full_round1'
+        boto_conn.download_from_s3('kgjamieson-general-compute/convolutional_mlp_random_full_round1','random_full')
+    local_path = 'random_full/convolutional_mlp_random_full_round1'
+
+    all_dt = []
 
     import csv
     from os import listdir
@@ -40,7 +42,7 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
 
         full_filename=local_path + '/' + f
         times = [-.0001]
-        losses = [0.1]
+        losses = [0.9]
         duration = 0
         min_err = float('inf')
         with open(full_filename, 'rb') as csvfile:
@@ -51,6 +53,7 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
                 validation_error = float(row[2])
                 test_error = float(row[3])
                 dt = float(row[4])
+                all_dt.append(dt)
                 params_str = row[0]+row[1]+row[6]+row[7]+row[8]
 
                 # sometimes same hyperparameter was trained on full dataset multiple times - remove this
@@ -84,4 +87,8 @@ def get_time_series_on_grid(grid_times,fresh_data=True):
             except:
                 data[k][i] = t[1][0]
 
+    import matplotlib.pyplot as plt
+    plt.hist(all_dt, 50, normed=1, facecolor='k', alpha=0.75)
+    plt.show()
+    raise
     return data

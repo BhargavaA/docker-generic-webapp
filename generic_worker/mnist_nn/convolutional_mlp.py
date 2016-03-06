@@ -123,7 +123,7 @@ def get_max_train_size():
 
 def get_max_iter():
     # maximum number of epochs to run
-    return 20
+    return 15
 
 def get_random_hyperparams(n=1):
     rng = numpy.random.RandomState() # generates from cache or something always random
@@ -356,7 +356,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs=200,
                         for i in range(n_test_batches)
                     ]
                     test_score = numpy.mean(test_losses)
-                    print(('\t\t     epoch %i, minibatch %i/%i, validation error %f %%, test error of '
+                    if verbose: print(('\t\t     epoch %i, minibatch %i/%i, validation error %f %%, test error of '
                            'best model %f %%') %
                           (epoch, minibatch_index + 1, n_train_batches, this_validation_loss*100.,
                            test_score * 100.))

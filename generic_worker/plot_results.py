@@ -11,7 +11,7 @@ import time
 
 
 fresh_data = False
-max_time = 1.25*3600
+max_time = 7*3600
 N = 1000
 grid_times = numpy.linspace(0,max_time,N)
 
@@ -71,13 +71,13 @@ print 'hyperband_iter timeseries = %d' % len(hyperband_iter_data)
 
 
 import matplotlib.pyplot as plt
-plt.plot(grid_times,random_data.T,color='black')
+# plt.plot(grid_times,random_data.T,color='black')
 plt.plot(grid_times,random_mean_data,linewidth=2,color='black',label='random' )
 # plt.plot(grid_times,nvb_data.T,color='red')
 # plt.plot(grid_times,nvb_mean_data,linewidth=2,color='red' ,label='nvb_batch'   )
 # plt.plot(grid_times,hyperband_batch_mean_data,linewidth=2,color='blue' ,label='hyperband_batch'   )
 plt.plot(grid_times,hyperband_iter_mean_data,linewidth=2,color='blue' ,label='hyperband_batch'   )
-plt.plot(grid_times,hyperband_iter_data.T,color='blue')
+# plt.plot(grid_times,hyperband_iter_data.T,color='blue')
 # plt.plot(grid_times,hyperband_batch_data.T,color='blue')
 # plt.plot(grid_times,nvb_iter_mean_data,linewidth=2,color='blue' ,label='nvb_iter'   )
 # plt.plot(grid_times,bandit_batch_mean_data,linewidth=2,color='m' ,label='bandit_batch'   )

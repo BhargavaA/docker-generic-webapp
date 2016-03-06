@@ -17,7 +17,7 @@ import boto_conn
 # rng = numpy.random.RandomState(12345)
 rng = numpy.random.RandomState() # generates from cache or something always random
 
-stop_time = 5*3600
+stop_time = 25*3600
 min_iter = int(2)
 max_iter = int(problem.get_max_iter())
 min_train_size = int(4000)

@@ -52,7 +52,7 @@ EC2_SRC_PATH = '/usr/local/web/'
 LOCAL_SRC_PATH = './../'
 
 DEFAULT_REGION = 'us-west-2'
-DEFAULT_AMI = 'ami-6989a659'  # Ubuntu Server 14.04 LTS 
+DEFAULT_AMI = 'ami-9abea4fb'  # Ubuntu Server 14.04 LTS 
 DEFAULT_USER = 'ubuntu'
 DEFAULT_INSTANCE_TYPE = 'm1.large'
 
