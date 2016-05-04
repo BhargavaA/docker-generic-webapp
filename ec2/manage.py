@@ -52,7 +52,7 @@ EC2_SRC_PATH = '/usr/local/web/'
 LOCAL_SRC_PATH = './../'
 
 DEFAULT_REGION = 'us-west-2'
-DEFAULT_AMI = 'ami-6989a659'  # Ubuntu Server 14.04 LTS 
+DEFAULT_AMI = 'ami-9abea4fb'  # Ubuntu Server 14.04 LTS 
 DEFAULT_USER = 'ubuntu'
 DEFAULT_INSTANCE_TYPE = 'm1.large'
 
@@ -351,6 +351,7 @@ def launch_cluster(conn, opts, cluster_name):
     for i in range(opts.root_vol_num):
         dev = EBSBlockDeviceType()
         dev.size = opts.root_vol_size
+        dev.delete_on_termination = True
         # dev.ephemeral_name = 'ephemeral%d' % i
         # The first ephemeral drive is /dev/sda1.
         name = '/dev/sd' + string.letters[i] + str(i+1)
@@ -463,19 +464,75 @@ def launch_cluster(conn, opts, cluster_name):
             master_type = opts.instance_type
         if opts.zone == 'all':
             opts.zone = random.choice(conn.get_all_zones()).name
-        master_res = image.run(key_name=opts.key_pair,
-                               security_group_ids=[master_group.id] + additional_group_ids,
-                               instance_type=master_type,
-                               placement=opts.zone,
-                               min_count=1,
-                               max_count=1,
-                               block_device_map=block_map,
-                               subnet_id=opts.subnet_id,
-                               placement_group=opts.placement_group,
-                               user_data=user_data_content)
 
-        master_nodes = master_res.instances
-        print "Launched master in %s, regid = %s" % (opts.zone, master_res.id)
+        if opts.spot_price is not None:
+            # Launch spot instances with the requested price
+            print ("Requesting master as spot instances with price $%.3f" %
+                   (opts.spot_price))
+            i = 0
+            my_req_ids = []
+            master_reqs = conn.request_spot_instances(
+                price=opts.spot_price,
+                image_id=opts.ami,
+                launch_group="launch-group-%s" % cluster_name,
+                placement=opts.zone,
+                count=1,
+                key_name=opts.key_pair,
+                security_group_ids=[master_group.id] + additional_group_ids,
+                instance_type=opts.instance_type,
+                block_device_map=block_map,
+                subnet_id=opts.subnet_id,
+                placement_group=opts.placement_group,
+                user_data=user_data_content)
+            my_req_ids += [req.id for req in master_reqs]
+
+            print "Waiting for spot instances to be granted..."
+            try:
+                while True:
+                    time.sleep(10)
+                    reqs = conn.get_all_spot_instance_requests()
+                    id_to_req = {}
+                    for r in reqs:
+                        id_to_req[r.id] = r
+                    active_instance_ids = []
+                    for i in my_req_ids:
+                        if i in id_to_req and id_to_req[i].state == "active":
+                            active_instance_ids.append(id_to_req[i].instance_id)
+                    if len(active_instance_ids) > 0:
+                        print "Machine granted"
+                        print "Launched master in %s" % opts.zone
+                        reservations = conn.get_all_reservations(active_instance_ids)
+                        master_nodes = []
+                        for r in reservations:
+                            master_nodes += r.instances
+                        break
+                    else:
+                        print "0 of 1 machines granted, waiting longer"
+            except:
+                print "Canceling spot instance requests"
+                conn.cancel_spot_instance_requests(my_req_ids)
+                # Log a warning if any of these requests actually launched instances:
+                (master_nodes, slave_nodes) = get_existing_cluster(
+                    conn, opts, cluster_name, die_on_error=False)
+                running = len(master_nodes) + len(slave_nodes)
+                if running:
+                    print >> stderr, ("WARNING: %d instances are still running" % running)
+                sys.exit(0)
+        else:
+
+
+            master_res = image.run(key_name=opts.key_pair,
+                                   security_group_ids=[master_group.id] + additional_group_ids,
+                                   instance_type=master_type,
+                                   placement=opts.zone,
+                                   min_count=1,
+                                   max_count=1,
+                                   block_device_map=block_map,
+                                   subnet_id=opts.subnet_id,
+                                   placement_group=opts.placement_group,
+                                   user_data=user_data_content)
+            master_nodes = master_res.instances
+            print "Launched master in %s, regid = %s" % (opts.zone, master_res.id)
 
     # This wait time corresponds to SPARK-4983
     print "Waiting for AWS to propagate instance metadata..."
@@ -644,7 +701,10 @@ def rsync_docker_config(opts, master_nodes, slave_nodes):
 
 
     unicorn_multiplier = 0.5
-    docker_compose_template_vars = {    }
+    docker_compose_template_vars = {   
+        "WORKER_WORKING_DIR":os.getenv('WORKER_WORKING_DIR','python ./main.py'),
+        "WORKER_COMMAND":os.getenv('WORKER_COMMAND',"/generic_worker"),
+    }
     with open('./templates/docker-compose.yml') as src:
         with open(tmp_dir+'/docker-compose.yml', "w") as dest:
             text = src.read()
@@ -915,7 +975,8 @@ def real_main():
             print "> %s" % inst.public_dns_name
 
         msg = "ALL DATA ON ALL NODES WILL BE LOST!!\nDestroy cluster %s (y/N): " % cluster_name
-        response = raw_input(msg)
+        # response = raw_input(msg)
+        response = 'y'
         if response == "y":
             print "Terminating master..."
             for inst in master_nodes:

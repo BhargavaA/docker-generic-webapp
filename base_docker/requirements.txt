@@ -1,5 +1,5 @@
-flask
-redis
-tornado
-gunicorn
 boto
+theano
+scikit-learn
+contexttimer
+joblib

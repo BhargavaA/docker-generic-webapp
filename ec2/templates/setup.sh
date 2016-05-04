@@ -5,11 +5,8 @@ apt-get update
 # install pip and some libraries (for convenience and test scripts)
 apt-get install -y \
     python \
-    python-dev \
-    python-distribute \
     python-pip \
     python-numpy \
-    python-scipy \
     git
 
 # python libraries (for convenience and test scripts)
