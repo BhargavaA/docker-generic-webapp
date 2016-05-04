@@ -674,6 +674,7 @@ def rsync_docker_config(opts, master_nodes, slave_nodes):
         "ACTIVE_MASTER": master,
         "SLAVE_LIST": ','.join([i.public_dns_name for i in slave_nodes]),
         "AWS_ACCESS_ID":os.getenv('AWS_ACCESS_KEY_ID'),
+        "AWS_ACCESS_KEY_ID":os.getenv('AWS_ACCESS_KEY_ID'),
         "AWS_SECRET_ACCESS_KEY":os.getenv('AWS_SECRET_ACCESS_KEY')
     }
     with open('./templates/docker_login.sh') as src:
