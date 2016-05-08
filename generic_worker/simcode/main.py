@@ -149,7 +149,7 @@ def predictionRun(n, d, pulls, radius):
     
 
 def relative_error(M, Mtrue):
-    return norm(M-Mtrue,'fro')**2/norm(Mtrue,'fro')**2
+    return norm(M-Mtrue,'fro')#**2/norm(Mtrue,'fro')**2
     
 
 def plot_errors(filename):
@@ -161,7 +161,7 @@ def plot_errors(filename):
     
     plt.figure(1)
     colors = ['r','g','b','c','m']
-    count = 0
+    
     # Prediction errors
     avg_pred_errors = defaultdict(list)
     avg_pred_stds = defaultdict(list)
@@ -177,12 +177,9 @@ def plot_errors(filename):
             avg_rel_errors[key].append(mean(rel_error_tmp))
             avg_rel_stds[key].append(std(rel_error_tmp))
 
+    plt.figure()
+    count = 0
     for key in errors.keys():
-        # plt.plot(arange(low,high,step),
-        #          avg_pred_errors[key],
-        #          marker='o',
-        #          color=colors[count],
-        #          label=key)
         plt.errorbar(arange(low,high,step),
                  avg_pred_errors[key],
                  avg_pred_stds[key],
@@ -193,13 +190,27 @@ def plot_errors(filename):
     plt.legend(loc='best')
     plt.xlabel('number of pulls')
     plt.ylabel('prediction error')
+    # plt.show()
+
+    plt.figure()
+    count = 0
+    for key in errors.keys():
+        plt.errorbar(arange(low,high,step),
+                 avg_rel_errors[key],
+                 avg_rel_stds[key],
+                 marker='o',
+                 color=colors[count],
+                 label=key)
+        count +=1
+    plt.legend(loc='best')
+    plt.xlabel('number of pulls')
+    plt.ylabel('relativea error')
     plt.show()
 
 
     
 if __name__== '__main__':
 
-    print os.environ.keys()
     if not 'AWS_SECRET_ACCESS_KEY' in os.environ.keys() or not 'AWS_ACCESS_KEY_ID' in os.environ.keys():
         print "You must set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY as environment variables"
         sys.exit()
@@ -208,13 +219,13 @@ if __name__== '__main__':
     data_filename = 'mds_'+UID+'.pkl'
     meta_filename = 'mds_'+UID+'.txt'
 
-    args = {'n':20,
+    args = {'n':64,
             'd':2,
             'trials':CORES,
             'radius':1.,
-            'low':500,
-            'high':1001,
-            'step':500,
+            'low':1000,
+            'high':100001,
+            'step':1000,
             'pkl':True,
             'filename':data_filename}
 
@@ -224,7 +235,7 @@ if __name__== '__main__':
 
 
     # ########## SAVE TO S3 ##########
-    S3_PATH = 'triplets-general-compute/16-5-4'
+    S3_PATH = 'triplets-general-compute/16-5-8'
     boto_conn.write_to_s3(local_filename_path=meta_filename,s3_path=S3_PATH+'/'+meta_filename)
     boto_conn.write_to_s3(local_filename_path=data_filename,s3_path=S3_PATH+'/'+data_filename)
     # ########################################
