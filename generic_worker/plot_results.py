@@ -21,7 +21,7 @@ random_mean_data = numpy.mean(random_data,axis=0)
 print 'random timeseries = %d' % len(random_data)
 
 
-from hyperband_iter.plot_results import get_time_series_on_grid as hyperband_iter_get
+from singe_user.plot_results import get_time_series_on_grid as hyperband_iter_get
 hyperband_iter_data = hyperband_iter_get(grid_times,fresh_data=fresh_data,result_type=result_type)
 hyperband_iter_mean_data = numpy.mean(hyperband_iter_data,axis=0)
 print 'hyperband_iter timeseries = %d' % len(hyperband_iter_data)
