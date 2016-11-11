@@ -1,7 +1,7 @@
 #!/bin/bash
 
 START_NUM=1
-END_NUM=39
+END_NUM=5
 LOG_SUFFIX=`date +"%Y_%m_%d_%H_%M_%S"`
 
 # for i in `seq $START_NUM $END_NUM`
@@ -85,7 +85,7 @@ LOG_SUFFIX=`date +"%Y_%m_%d_%H_%M_%S"`
 
 for i in `seq $START_NUM $END_NUM`
 do
-  export WORKER_WORKING_DIR="/generic_worker/hyperband_iter"
+  export WORKER_WORKING_DIR="/generic_worker/single_user"
   export WORKER_COMMAND="python ./main.py"
   machine_name=kevin_research_hyperband_iter_"$i"
   log_name=cluster-hyperband_iter-"$i"-"$LOG_SUFFIX".out
